@@ -14,24 +14,34 @@ then
   Best_game=10000
 else
   IFS="|" read -r Name Nb_game Best_game <<< "$PLAYED"
-  echo "Welcome back, $USERNAME! You have played $Nb_game games, and your best game took $Best_game guesses."
+  sBest_game=$Best_game
+  if [[ -z $Nb_game ]]
+  then
+    Nb_game=0
+  fi
+  if [[ $Best_game -eq 10000 ]]
+  then
+    sBest_game=0
+  fi
+  echo "Welcome back, $USERNAME! You have played $Nb_game games, and your best game took $sBest_game guesses."
 fi
 
 NOT_FOUND=TRUE
 COUNTER=0
 while [[ $NOT_FOUND ]]; do
+  COUNTER=$((COUNTER + 1))
   echo -e "\nGuess the secret number between 1 and 1000:"
   read GUESS
   if [[ $GUESS =~ ^[0-9]+$ ]]
   then
-    COUNTER=$((COUNTER + 1))
+    
     #echo $COUNTER
     if [[ $GUESS -eq $SECRET ]]
     then
-      echo -e "\nYou guessed it in $COUNTER tries. The secret number was $SECRET. Nice job!\n"
       min=$(( COUNTER <= Best_game ? COUNTER : Best_game ))
       Nb_game=$(( Nb_game + 1 ))
-      $PSQL "UPDATE users SET nb_game=$Nb_game, best_score=$min WHERE name='$USERNAME'" > /dev/null  
+      $PSQL "UPDATE users SET nb_game=$Nb_game, best_score=$min WHERE name='$USERNAME'" > /dev/null
+      echo -e "\nYou guessed it in $COUNTER tries. The secret number was $SECRET. Nice job!"
       exit 0
     elif [[ $GUESS -lt $SECRET ]]
     then
