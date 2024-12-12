@@ -16,6 +16,7 @@ else
   IFS="|" read -r Name Nb_game Best_game <<< "$PLAYED"
   echo "Welcome back, $USERNAME! You have played $Nb_game games, and your best game took $Best_game guesses."
 fi
+
 NOT_FOUND=TRUE
 COUNTER=0
 while [[ $NOT_FOUND ]]; do
@@ -29,7 +30,6 @@ while [[ $NOT_FOUND ]]; do
     then
       echo -e "\nYou guessed it in $COUNTER tries. The secret number was $SECRET. Nice job!\n"
       min=$(( COUNTER <= Best_game ? COUNTER : Best_game ))
-      #echo $min
       Nb_game=$(( Nb_game + 1 ))
       $PSQL "UPDATE users SET nb_game=$Nb_game, best_score=$min WHERE name='$USERNAME'" > /dev/null  
       exit 0
